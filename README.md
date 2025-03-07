@@ -1,2 +1,2 @@
-# Otus_Linux
-Home works for course Otuse Linux Professional
+## Otus_Linux
+#Home works for course Otus Linux Professional
