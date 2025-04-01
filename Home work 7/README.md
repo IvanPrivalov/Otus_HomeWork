@@ -44,22 +44,22 @@ root@grub:~# reboot
 
 При загрузке в окне виртуальной машины мы должны увидеть меню загрузчика.
 
-![image 1](https://github.com/IvanPrivalov/Otus_HomeWork/blob/main/screens/Screenshot_01.png)
+![image 1](https://github.com/IvanPrivalov/Otus_HomeWork/blob/main/Home%20work%207/screens/Screenshot_01.png)
 
 ### Попасть в систему без пароля несколькими способами
 
 Для получения доступа необходимо открыть GUI VirtualBox, запустить виртуальную машину и при выборе ядра для загрузки нажать e - в данном контексте edit. Попадаем в окно, где мы можем изменить параметры загрузки:
 
-![image 2](https://github.com/IvanPrivalov/Otus_HomeWork/blob/main/screens/Screenshot_02.png)
+![image 2](https://github.com/IvanPrivalov/Otus_HomeWork/blob/main/Home%20work%207/screens/Screenshot_02.png)
 
 #### Способ 1. init=/bin/bash
 В конце строки, начинающейся с linux, добавляем rw init=/bin/bash и нажимаем сtrl-x для загрузки в систему:
 
-![image 3](https://github.com/IvanPrivalov/Otus_HomeWork/blob/main/screens/Screenshot_03.png)
+![image 3](https://github.com/IvanPrivalov/Otus_HomeWork/blob/main/Home%20work%207/screens/Screenshot_03.png)
 
 В целом на этом все, Вы попали в систему.
 
-![image 4](https://github.com/IvanPrivalov/Otus_HomeWork/blob/main/screens/Screenshot_04.png)
+![image 4](https://github.com/IvanPrivalov/Otus_HomeWork/blob/main/Home%20work%207/screens/Screenshot_04.png)
 
 Затем запустить команду passwd для изменения пароля root. 
 
@@ -70,13 +70,13 @@ root@grub:~# reboot
 В меню загрузчика на первом уровне выбрать второй пункт (Advanced options…), далее загрузить пункт меню с указанием recovery mode в названии. 
 Получим меню режима восстановления.
 
-![image 5](https://github.com/IvanPrivalov/Otus_HomeWork/blob/main/screens/Screenshot_05.png)
+![image 5](https://github.com/IvanPrivalov/Otus_HomeWork/blob/main/Home%20work%207/screens/Screenshot_05.png)
 
 В этом меню сначала включаем поддержку сети (network) для того, чтобы файловая система перемонтировалась в режим read/write (либо это можно сделать вручную).
 Далее выбираем пункт root и попадаем в консоль с пользователем root. Если вы ранее устанавливали пароль для пользователя root (по умолчанию его нет), то необходимо его ввести. 
 В этой консоли можно производить любые манипуляции с системой.
 
-![image 6](https://github.com/IvanPrivalov/Otus_HomeWork/blob/main/screens/Screenshot_06.png)
+![image 6](https://github.com/IvanPrivalov/Otus_HomeWork/blob/main/Home%20work%207/screens/Screenshot_06.png)
 
 ### Установить систему с LVM, после чего переименовать VG
 
