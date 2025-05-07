@@ -1,0 +1,1 @@
+nginx ansible_host=127.0.0.1 ansible_port=2222 ansible_private_key_file='/home/ivan/Desktop/Otus_HomeWork/Home work 12/Ansible/.vagrant/machines/nginx/virtualbox/private_key'

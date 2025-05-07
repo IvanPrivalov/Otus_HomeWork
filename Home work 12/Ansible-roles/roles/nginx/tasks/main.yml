@@ -1,0 +1,24 @@
+---
+- name: update
+  apt:
+    update_cache=yes
+  tags:
+    - apdate apt
+
+- name: NGINX | Install NGINX
+  apt:
+    name: nginx
+    state: latest
+  notify:
+    - restart nginx
+  tags:
+    - nginx-package
+
+- name: NGINX | Create nginx config file from template
+  template:
+    src: templates/nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+  notify:
+    - reload nginx
+  tags:
+    - nginx-configuration
