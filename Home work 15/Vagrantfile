@@ -1,0 +1,66 @@
+ENV['VAGRANT_SERVER_URL'] = 'http://vagrant.elab.pro'
+
+
+MACHINES = {
+  :"zabbix-server" => {
+              :box_name => "almalinux/9",
+              :box_version => "1.0.0",
+              :cpus => 2,
+              :memory => 1024,
+              :ip => '192.168.56.3',
+            },
+  :"zabbix-agent" => {
+              :box_name => "almalinux/9",
+              :box_version => "1.0.0",
+              :cpus => 1,
+              :memory => 1024,
+              :ip => '192.168.56.4',
+            }
+}
+
+Vagrant.configure("2") do |config|
+  MACHINES.each do |boxname, boxconfig|
+    config.vm.synced_folder ".", "/vagrant", disabled: true
+    config.vm.define boxname do |box|
+      box.vm.box = boxconfig[:box_name]
+      box.vm.box_version = boxconfig[:box_version]
+      box.vm.host_name = boxname.to_s
+      box.vm.network "private_network", ip: boxconfig[:ip]
+#      box.vm.network "private_network", type: "dhcp"
+      box.vm.provider "virtualbox" do |v|
+        v.memory = boxconfig[:memory]
+        v.cpus = boxconfig[:cpus]
+      end
+#      box.vm.provision "shell", inline: <<-SHELL
+#        mkdir -p ~root/.ssh
+#        cp ~vagrant/.ssh/auth* ~root/.ssh
+#      SHELL
+      case boxname.to_s
+      when "zabbix-server"
+        box.vm.provision "file", source: "./script", destination: "/tmp"
+        box.vm.provision "shell", inline: <<-SHELL
+          mkdir -p ~root/.ssh
+          cp ~vagrant/.ssh/auth* ~root/.ssh
+          sed -i '65s/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+          systemctl restart sshd
+          sudo -i
+          cp /tmp/zabbix.sh /root/
+          chmod 0777 /root/zabbix.sh
+          bash /root/zabbix.sh
+      SHELL
+      when "zabbix-agent"
+        box.vm.provision "file", source: "./script", destination: "/tmp"
+        box.vm.provision "shell", inline: <<-SHELL
+          mkdir -p ~root/.ssh
+          cp ~vagrant/.ssh/auth* ~root/.ssh
+          sed -i '65s/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+          systemctl restart sshd
+          sudo -i
+          cp /tmp/zabbix_agent.sh /root/
+          chmod 0777 /root/zabbix_agent.sh
+          bash /root/zabbix_agent.sh
+      SHELL
+      end  
+    end
+  end
+end
