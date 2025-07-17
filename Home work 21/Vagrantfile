@@ -1,0 +1,85 @@
+ENV['VAGRANT_SERVER_URL'] = 'http://vagrant.elab.pro'
+
+MACHINES = {
+  :inetRouter => {
+    :box_name => "centos/7",
+    :vm_name => "inetRouter",
+    :net => [
+               ["10.1.1.1", 2, "255.255.255.252", "router-net"],
+            ]
+  },
+  :inetRouter2 => {
+    :box_name => "centos/7",
+    :vm_name => "inetRouter2",
+    :net => [
+               ["10.2.2.1", 2, "255.255.255.252", "router-net1"],
+               ["192.168.12.12", 3, "255.255.255.0", "local-net"],            
+            ]
+  },
+  :centralRouter => {
+    :box_name => "centos/7",
+    :vm_name => "centralRouter",
+    :net => [
+               ["10.1.1.2", 2, "255.255.255.252", "router-net"],
+               ["10.2.2.2", 3, "255.255.255.252", "router-net1"],
+               ["192.168.0.33", 4, "255.255.255.240", "hw-net"],
+            ]
+  },
+  :centralServer => {
+    :box_name => "centos/7",
+    :vm_name => "centralServer",
+    :net => [
+               ["192.168.0.40", 2, "255.255.255.240", "hw-net"],
+            ]
+  },
+}
+
+Vagrant.configure("2") do |config|
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = 256
+    vb.cpus = 1
+  end
+  
+  MACHINES.each do |boxname, boxconfig|
+
+    config.vm.define boxname do |box|
+        box.vm.box = boxconfig[:box_name]
+        box.vm.host_name = boxname.to_s
+        
+        boxconfig[:net].each do |ipconf|
+            box.vm.network("private_network", ip: ipconf[0], adapter: ipconf[1], netmask: ipconf[2], virtualbox__intnet: ipconf[3])
+        end
+        
+        if boxconfig.key?(:public)
+            box.vm.network "public_network", boxconfig[:public]
+        end
+
+        box.vm.provision "shell", inline: <<-SHELL
+            mkdir -p ~root/.ssh
+            cp ~vagrant/.ssh/auth* ~root/.ssh
+        SHELL
+        
+        case boxname.to_s
+        when "inetRouter"
+          box.vm.provision "shell",
+            name: "inetRouter",
+            path: "inetRouter.sh"
+
+        when "inetRouter2"
+          box.vm.provision "shell",
+            name: "inetRouter2",
+            path: "inetRouter2.sh"
+
+        when "centralRouter"
+          box.vm.provision "shell",
+            name: "centralRouter",
+            path: "centralRouter.sh"
+
+        when "centralServer"
+          box.vm.provision "shell",
+            name: "centralServer",
+            path: "centralServer.sh"
+        end
+      end
+  end
+end
