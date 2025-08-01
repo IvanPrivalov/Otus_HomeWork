@@ -1,0 +1,51 @@
+ENV['VAGRANT_SERVER_URL'] = 'http://vagrant.elab.pro'
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "centos/7"
+
+  config.vm.provider "virtualbox" do |v|
+	  v.memory = 256
+  end
+
+  config.vm.define "ns01" do |ns01|
+    ns01.vm.network "private_network", ip: "192.168.50.10", virtualbox__intnet: "dns"
+    #management network
+    ns01.vm.network "private_network", ip: "192.168.56.10"
+    ns01.vm.hostname = "ns01"
+  end
+
+  config.vm.define "ns02" do |ns02|
+    ns02.vm.network "private_network", ip: "192.168.50.11", virtualbox__intnet: "dns"
+    #management network
+    ns02.vm.network "private_network", ip: "192.168.56.11"
+    ns02.vm.hostname = "ns02"
+  end
+
+  config.vm.define "client1" do |client1|
+    client1.vm.network "private_network", ip: "192.168.50.15", virtualbox__intnet: "dns"
+    #management network
+    client1.vm.network "private_network", ip: "192.168.56.15"
+    client1.vm.hostname = "client1"
+  end
+
+  config.vm.define "client2" do |client2|
+    client2.vm.network "private_network", ip: "192.168.50.16", virtualbox__intnet: "dns"
+    #management network
+    client2.vm.network "private_network", ip: "192.168.56.16"
+    client2.vm.hostname = "client2"
+  end
+
+  config.vm.provision "shell", inline: <<-SHELL
+        mkdir -p ~root/.ssh
+        cp ~vagrant/.ssh/auth* ~root/.ssh
+        sed -i 's/^PasswordAuthentication.*$/PasswordAuthentication yes/' /etc/ssh/sshd_config
+        sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+        sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+        systemctl restart sshd.service
+      SHELL
+  
+#  config.vm.provision "dns", type:'ansible' do |ansible|
+#    ansible.inventory_path = './inventories/all.yml'
+#    ansible.playbook = "./dns.yml"
+#  end
+end

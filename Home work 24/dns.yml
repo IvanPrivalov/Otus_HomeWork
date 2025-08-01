@@ -1,0 +1,12 @@
+---
+- hosts: dnsservers
+  become: true
+
+  roles:
+    - dns-server
+
+- hosts: clients
+  become: true
+
+  roles:
+    - dns-client

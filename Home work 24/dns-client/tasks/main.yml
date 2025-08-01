@@ -1,0 +1,29 @@
+---
+# tasks file for dns-client
+- name: Install packages
+  yum:
+    name:
+      - bind-utils
+      - ntp
+    state: present
+
+- name: Copy zone update key to clients for zone's update
+  copy:
+    src: named.zoneupdate.key
+    dest: /etc/named.zoneupdate.key
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Copy resolv.conf to the client
+  copy:
+    src: client-resolv.conf
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Prevent update resolv.conf by Network Manager
+  file:
+    path: /etc/resolv.conf
+    attr: +i

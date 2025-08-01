@@ -1,0 +1,91 @@
+---
+# tasks file for dns-server
+- name: Install packages
+  yum:
+    name:
+      - bind
+      - bind-utils
+      - ntp
+    state: present
+
+- name: Copy key for zone update to ns01
+  copy:
+    src: named.zoneupdate.key
+    dest: /etc/named.zoneupdate.key
+    owner: root
+    group: named
+    mode: 0644
+
+- name: Copy named.conf to ns01
+  copy:
+    src: master-named.conf
+    dest: /etc/named.conf
+    owner: root
+    group: named
+    mode: 0640
+  when: (ansible_hostname == 'ns01')
+  notify:
+    - restart named
+
+- name: Copy named.conf to ns02
+  copy:
+    src: slave-named.conf
+    dest: /etc/named.conf
+    owner: root
+    group: named
+    mode: 0640
+  when: (ansible_hostname == 'ns02')
+  notify:
+    - restart named
+
+- name: Copy zones to ns01
+  copy:
+    src: "{{ item }}"
+    dest: /var/named/
+    owner: root
+    group: named
+    mode: 0660
+  with_fileglob:
+    - named.client*
+    - named.general*
+    - named.new*
+  when: (ansible_hostname == 'ns01')
+  notify:
+    - restart named
+
+- name: Copy dynamic zone to ns01
+  copy:
+    src: named.ddns.lab
+    dest: /var/named/dynamic/
+    owner: root
+    group: named
+    mode: 0660
+  when: (ansible_hostname == 'ns01')
+  notify:
+    - restart named
+
+- name: Copy resolv.conf to the dns-servers
+  copy:
+    src: servers-resolv.conf
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Prevent update resolv.conf by network service
+  file:
+    path: /etc/resolv.conf
+    attr: +i
+
+# - name: Set /etc/named permissions
+#   file:
+#     path: /etc/named
+#     owner: root
+#     group: named
+#     mode: 0670
+
+- name: Ensure named is running and enabled
+  service:
+    name: named
+    state: started
+    enabled: yes
