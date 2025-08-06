@@ -1,0 +1,66 @@
+---
+- name: Allow forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: yes
+  when: (ansible_hostname == 'inetRouter') or (ansible_hostname == 'centralRouter')
+
+- name: Enable firewalld
+  service:
+    name: firewalld
+    state: started
+    enabled: yes
+  when: ansible_hostname == 'inetRouter'
+
+- name: Move eth0 to external zone
+  lineinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-eth0
+    line: 'ZONE=external'
+  when: ansible_hostname == 'inetRouter'
+  notify:
+    - restart network
+
+- name: Enable masquerade
+  firewalld:
+    masquerade: yes
+    state: enabled
+    permanent: yes
+    zone: external
+  when: ansible_hostname == 'inetRouter'
+  notify:
+    - reload firewalld
+
+- name: Remove Vagrant default route
+  lineinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-eth0
+    line: 'DEFROUTE=no'
+  when: ansible_hostname != 'inetRouter'
+  notify:
+    - restart network
+
+- name: Add default route
+  lineinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-eth1
+    line: 'GATEWAY=192.168.2.1'
+  when: (ansible_hostname != 'inetRouter') and (ansible_hostname != 'centralRouter')
+  notify:
+    - restart network
+
+- name: Add route to test lan
+  lineinfile:
+    path: /etc/sysconfig/network-scripts/route-bond0
+    line: '192.168.2.0/24 via 10.1.1.2'
+    create: yes
+  when: ansible_hostname == 'inetRouter'
+  notify:
+    - restart network
+
+- name: Move eth0 to external zone again
+  lineinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-eth0
+    regexp: '^ZONE=.*$'
+    line: 'ZONE=external'
+  when: ansible_hostname == 'inetRouter'
+  notify:
+    - restart network

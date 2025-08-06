@@ -1,0 +1,15 @@
+---
+- hosts: vlan
+  become: true
+  roles:
+    - vlan
+
+- hosts: bonding
+  become: true
+  roles:
+    - bonding
+
+- hosts: all
+  become: true
+  roles:
+    - ipconfig

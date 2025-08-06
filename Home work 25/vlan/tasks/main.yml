@@ -1,0 +1,43 @@
+---
+- name: Install packages
+  yum:
+    name:
+      - tcpdump
+    state: present
+
+- name: Include vars for testClient1
+  include_vars: testClient1.yml
+  when: ansible_hostname == 'testClient1'
+
+- name: Include vars for testClient2
+  include_vars: testClient2.yml
+  when: ansible_hostname == 'testClient2'
+
+- name: Include vars for testServer1
+  include_vars: testServer1.yml
+  when: ansible_hostname == 'testServer1'
+
+- name: Include vars for testServer2
+  include_vars: testServer2.yml
+  when: ansible_hostname == 'testServer2'
+
+- name: Enable 802.1q kernel module
+  modprobe:
+    name: 8021q
+    state: present
+
+- name: Create vlan10 interfaces
+  template:
+    src: ifcfg-vlan10.j2
+    dest: /etc/sysconfig/network-scripts/ifcfg-eth1.10
+  when: (ansible_hostname == 'testClient1') or (ansible_hostname == 'testServer1')
+  notify:
+    - restart network
+
+- name: Create vlan20 interfaces
+  template:
+    src: ifcfg-vlan20.j2
+    dest: /etc/sysconfig/network-scripts/ifcfg-eth1.20
+  when: (ansible_hostname == 'testClient2') or (ansible_hostname == 'testServer2')
+  notify:
+    - restart network

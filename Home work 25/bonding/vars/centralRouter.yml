@@ -1,0 +1,3 @@
+teamip: '10.1.1.2'
+teamnetmask: '255.255.255.252'
+defroutecr: '10.1.1.1'

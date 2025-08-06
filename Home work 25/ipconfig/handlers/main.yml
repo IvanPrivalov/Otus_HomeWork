@@ -1,0 +1,10 @@
+---
+- name: restart network
+  systemd:
+    name: network
+    state: restarted
+
+- name: reload firewalld
+  systemd:
+    name: firewalld
+    satte: reloaded

@@ -1,0 +1,35 @@
+---
+
+- name: Include vars for inetRouter
+  include_vars: inetRouter.yml
+  when: ansible_hostname == 'inetRouter'
+
+- name: Include vars for centralRouter
+  include_vars: centralRouter.yml
+  when: ansible_hostname == 'centralRouter'
+
+- name: Setting up bond-interface on inetRouter
+  template:
+    src: ifcfg-bond0-ir.j2
+    dest: /etc/sysconfig/network-scripts/ifcfg-bond0
+  when: ansible_hostname == 'inetRouter'
+  notify:
+    - restart network
+
+- name: Setting up bond-interface on centralRouter
+  template:
+    src: ifcfg-bond0-cr.j2
+    dest: /etc/sysconfig/network-scripts/ifcfg-bond0
+  when: ansible_hostname == 'centralRouter'
+  notify:
+    - restart network
+
+- name: Add interfaces to bonding
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - {src: 'ifcfg-eth1.j2', dest: '/etc/sysconfig/network-scripts/ifcfg-eth1'}
+    - {src: 'ifcfg-eth2.j2', dest: '/etc/sysconfig/network-scripts/ifcfg-eth2'}
+  notify:
+    - restart network
