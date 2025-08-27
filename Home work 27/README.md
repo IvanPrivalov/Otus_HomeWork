@@ -75,5 +75,12 @@ php-fpm/laravel - http://192.168.56.10:10001/
 
 http://192.168.56.10:10001/homework
 
-![image 1](https://github.com/IvanPrivalov/Otus_HomeWork/blob/main/Home%20work%2027/screens/Screenshot_02.png)
+![image 2](https://github.com/IvanPrivalov/Otus_HomeWork/blob/main/Home%20work%2027/screens/Screenshot_02.png)
 
+uwsgi/django - http://192.168.56.10:10002/
+
+![image 3](https://github.com/IvanPrivalov/Otus_HomeWork/blob/main/Home%20work%2027/screens/Screenshot_03.png)
+
+nodejs/reactjs - http://192.168.56.10:10003/
+
+![image 4](https://github.com/IvanPrivalov/Otus_HomeWork/blob/main/Home%20work%2027/screens/Screenshot_04.png)
