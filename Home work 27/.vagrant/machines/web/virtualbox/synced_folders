@@ -1,0 +1,1 @@
+{"rsync":{"/vagrant":{"type":"rsync","guestpath":"/vagrant","hostpath":"/home/ivan/Desktop/Otus_HomeWork/Home work 27","disabled":false,"__vagrantfile":true,"owner":"vagrant","group":"vagrant"}}}
