@@ -1,0 +1,29 @@
+ENV['VAGRANT_SERVER_URL'] = 'http://vagrant.elab.pro'
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "centos/7"
+  
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 1024
+    v.cpus = 1
+  end
+
+  config.vm.define "master" do |server|
+    server.vm.network "private_network", ip: "192.168.56.10"
+    server.vm.hostname = "master"
+  end
+
+  config.vm.define "slave" do |client|
+    client.vm.network "private_network", ip: "192.168.56.20"
+    client.vm.hostname = "slave"
+  end
+
+  config.vm.provision "shell", inline: <<-SHELL
+        mkdir -p ~root/.ssh
+        cp ~vagrant/.ssh/auth* ~root/.ssh
+        sed -i 's/^PasswordAuthentication.*$/PasswordAuthentication yes/' /etc/ssh/sshd_config
+        sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+        sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+        systemctl restart sshd.service
+      SHELL
+end
