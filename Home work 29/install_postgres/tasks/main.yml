@@ -1,0 +1,16 @@
+---
+  # Устанавливаем postgresql14-server
+  - name: install postgresql-server 14
+    ansible.builtin.apt: 
+      name: 
+          - postgresql 
+          - postgresql-contrib
+      state: present
+      update_cache: true
+  
+  # Запускаем postgresql-14
+  - name: enable and start service
+    ansible.builtin.service:
+      name: postgresql
+      state: started
+      enabled: true

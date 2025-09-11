@@ -1,0 +1,33 @@
+ENV['VAGRANT_SERVER_URL'] = 'http://vagrant.elab.pro'
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "ubuntu/jammy64"
+  
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 1024
+    v.cpus = 1
+  end
+
+  config.vm.define "node1" do |server|
+    server.vm.network "private_network", ip: "192.168.56.11"
+    server.vm.hostname = "node1"
+  end
+
+  config.vm.define "node2" do |server|
+    server.vm.network "private_network", ip: "192.168.56.12"
+    server.vm.hostname = "node2"
+  end
+
+  config.vm.define "barman" do |client|
+    client.vm.network "private_network", ip: "192.168.56.13"
+    client.vm.hostname = "barman"
+  end
+
+      config.vm.provision "shell", inline: <<-SHELL
+         timedatectl set-timezone Europe/Moscow
+         mkdir -p ~root/.ssh
+         cp ~vagrant/.ssh/auth* ~root/.ssh
+         sed -i 's/^PasswordAuthentication.*$/PasswordAuthentication yes/' /etc/ssh/sshd_config
+         systemctl restart sshd.service
+      SHELL
+end
